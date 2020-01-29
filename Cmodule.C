@@ -9,13 +9,13 @@
 #define countElements 20000
 #define countBuf 3
 
-typedef enum {
+enum workType{
 Ready,
 Write,
 Pause
-} workType;
+};
 
-bool StateA, StateB;//каналы gpio
+bool State_A, State_B;//каналы gpio
 bool Mah=true;//фикс движения обратно
 double Time[countElements];//массив с временем
 int Coord[countElements];//массив с координатами
@@ -46,7 +46,7 @@ count=0;
 }
 
 void getCurrentCoordinate(int write){ //получить текующую координату
-fprintf((FILE*)write, "%s\n", Coordinate);//пишем координату Python
+fprintf((FILE*)write, "%ld\n", Coordinate);//пишем координату Python
 }
 
 void getDataFromSensor(int write){
@@ -55,7 +55,6 @@ fprintf((FILE*)write, "%s\n","N");//нечего отправлять
 return;
 }
 timevalToDouble();//преобразование времени
-char outT[20],outC[16];
 fprintf((FILE*)write, "%d\n", count);//передаем размерность массива
 
 for(int i=0;i<=count;i++){
@@ -72,7 +71,7 @@ void ISR_A()//прерывание по каналу A
 switch(typeWork){//смотрим текущее состояние работы
 
 case Ready ://ожидание смещения для записи
-StateA = !StateA;
+State_A = !State_A;
 if (State_B != State_A){
 Coordinate++;
 if(abs(Coordinate)>pendPoint){//проверка на смещение относительно начала
@@ -90,7 +89,7 @@ Channel='-';
 break;
 
 case Write ://запись данных в память
-StateA = !StateA;
+State_A = !State_A;
 if (State_B != State_A){//движение в одну сторону
 if(Channel=='+'){//если текущее направление движения совпадает с начальным-пишем
 Coordinate++;
@@ -116,7 +115,7 @@ else {//движение в противоположную сторону
 
 if(Channel=='-'){//если текущее направление движения совпадает с начальным-пишем
 Coordinate--;
-Coord[count]=abs(Coordinate;)
+Coord[count]=abs(Coordinate);
 gettimeofday(&timevals[count], NULL);
 count++;
 Mah=true;
@@ -133,11 +132,9 @@ typeWork=Pause;
 }
 
 }
-}
 break;
-
 case Pause://просто отслеживаем маятик без записи в память
-StateB = !StateB;
+State_A = !State_A;
 if (State_B != State_A)
 Coordinate++;
 else {
@@ -145,16 +142,16 @@ Coordinate--;
 }
 break;
 
+}
+}
+
 void ISR_B()
 {
 switch(typeWork){
 
 case Ready ://ожидание сдвига маятника на n тиков
-StateB = !StateB;
-if (State_B ==
-
- 
-State_A){
+State_B = !State_B;
+if (State_B == State_A){
 Coordinate++;
 if(abs(Coordinate)>pendPoint){//переход в режим записи
 typeWork=Write;
@@ -171,7 +168,7 @@ Channel='-';
 break;
 
 case Write ://запись маха
-StateB = !StateB;
+State_B = !State_B;
 if (State_B == State_A){//движение в одну сторону
 if(Channel=='+'){//если текущее направление движения совпадает с начальным-пишем
 Coordinate++;
@@ -216,52 +213,57 @@ typeWork=Pause;
 break;
 
 case Pause ://просто отслеживаем маятик без записи в память
-StateB = !StateB;
+State_B = !State_B;
 if (State_B == State_A)
 Coordinate++;
 else {
 Coordinate--;
 }
 break;
-}
 
 }
+}
+
+
 
 int main()
 {
 readbuffer[0]='0';
 int fd[2];
 pipe(fd);
-const int ChannelA = 23;
+wiringPiSetupGpio (); //BCM mode
+pinMode (23, INPUT);
+pinMode(24, INPUT);
+State_A = digitalRead(23);
+State_B = digitalRead(24);
 while(1) {
 fgets(readbuffer,countBuf,(FILE*)fd[0]);
 
 if(readbuffer[0]== 'E')exit(0);//Выход
 if(readbuffer[0]== 'N'){//получение текущей координаты
-getCurrentCoordinate(&write);
+getCurrentCoordinate(fd[1]);
 }
 if(readbuffer[0]== 'W'){//Запись в буфер маха
 Clear();
 gettimeofday(&start, NULL);
 typeWork=Ready;
-state=Run;
 }
 if(readbuffer[0]== 'M'){//Отдать данные в систему
 typeWork=Pause;
-getDataFromSensor(&write);
+getDataFromSensor(fd[1]);
 typeWork=Ready;
 }
 if(readbuffer[0]== 'C'){//Сброс
 Clear();
 Coordinate=0;
 Channel='o';
-offsetPoint=0;
+pendPoint=0;
 offsetPointMax=0;
 }
 if(readbuffer[0]== 'S'){//Изменение чувствительнсоти
-fgets(readbuffer,countBuf,(FILE*)fd[0]);
+{fgets(readbuffer,countBuf,(FILE*)fd[0]);
 
-sscanf(readbuffer, "%d", &offsetPoint);
+sscanf(readbuffer, "%d", &pendPoint);
 fgets(readbuffer,countBuf,(FILE*)fd[0]);
 
 sscanf(readbuffer, "%d", &offsetPointMax);
@@ -269,5 +271,5 @@ sscanf(readbuffer, "%d", &offsetPointMax);
 usleep(stopReadFromPipe);// сон после выполнения операция на пол сек
 
 }
-
+}
 }
