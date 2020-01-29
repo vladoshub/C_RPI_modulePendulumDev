@@ -153,8 +153,6 @@ case Ready ://ожидание сдвига маятника на n тиков
 StateB = !StateB;
 if (State_B ==
 
-Start TV | start.ca
-www.start.ca
  
 State_A){
 Coordinate++;
