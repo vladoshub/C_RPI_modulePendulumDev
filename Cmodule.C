@@ -57,12 +57,12 @@ return;
 timevalToDouble();//преобразование времени
 char outT[20],outC[16];
 fprintf((FILE*)write, "%d\n", count);//передаем размерность массива
-fflush(write);
+
 for(int i=0;i<=count;i++){
 fprintf((FILE*)write, "%f\n", Time[i]);//отсылаем время 1 тика
-fflush((FILE*)write);
+
 fprintf((FILE*)write, "%d\n", Coord[i]);//отсылаем координату 1 тика
-fflush((FILE*)write);
+
 }
 Clear();
 }
@@ -235,7 +235,7 @@ pipe(fd);
 const int ChannelA = 23;
 while(1) {
 fgets(readbuffer,countBuf,(FILE*)fd[0]);
-fflush((FILE*)fd[0]);
+
 if(readbuffer[0]== 'E')exit(0);//Выход
 if(readbuffer[0]== 'N'){//получение текущей координаты
 getCurrentCoordinate(&write);
@@ -260,10 +260,10 @@ offsetPointMax=0;
 }
 if(readbuffer[0]== 'S'){//Изменение чувствительнсоти
 fgets(readbuffer,countBuf,(FILE*)fd[0]);
-fflush((FILE*)fd[0]);
+
 sscanf(readbuffer, "%d", &offsetPoint);
 fgets(readbuffer,countBuf,(FILE*)fd[0]);
-fflush((FILE*)fd[0]);
+
 sscanf(readbuffer, "%d", &offsetPointMax);
 }
 usleep(stopReadFromPipe);// сон после выполнения операция на пол сек
