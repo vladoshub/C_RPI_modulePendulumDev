@@ -49,28 +49,28 @@ start = (struct timeval){0};
 count=0;
 }
 
-void getCurrentCoordinate(int write){ //получить текующую координату
+void getCurrentCoordinate(int w){ //получить текующую координату
 n=sprintf(out, "%ld\n", Coordinate);
-write(write, out, n);
+write(w, out, n);
 }
 
-void getDataFromSensor(int write){
+void getDataFromSensor(int w){
 if(count<1){
-write(write, "N", 1);
+write(w, "N", 1);
 return;
 }
 timevalToDouble();//преобразование времени
 
 n=sprintf(out, "%ld\n", count);
-write(write, out, n);
+write(w, out, n);
   
   
 for(int i=0;i<=count;i++){
 n=sprintf(out, "%f\n", Time[i]);
-write(write, out, n);
+write(w, out, n);
 
 n=sprintf(out, "%ld\n", Coord[i]);
-write(write, out, n);
+write(w, out, n);
 
 }
 Clear();
