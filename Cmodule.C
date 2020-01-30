@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #define countElements 20000
 #define countBuf 3
+#define countBufArray 10
 
 enum workType{
 Ready,
@@ -15,6 +16,7 @@ Write,
 Pause
 };
 
+char out[countBufArray];
 bool State_A, State_B;//каналы gpio
 bool Mah=true;//фикс движения обратно
 double Time[countElements];//массив с временем
@@ -25,6 +27,7 @@ struct timeval start;//время от запуска всей программ�
 struct timeval timevals[countElements];//массив структуры миллисекунд
 int stopReadFromPipe=100000;//остановка на 1/10 сек для считывания с pipe
 char readbuffer[countBuf];//буфер для чтения
+char bufe[countBuf];//буфер для чтения
 char Channel='o';//напралвение движения
 int pendPoint=10;//точка начала отчета
 int offsetPointMax=2;//максимально возможное смещение в сторону противоположную перемещению маятника при измерении маха
@@ -46,21 +49,27 @@ count=0;
 }
 
 void getCurrentCoordinate(int write){ //получить текующую координату
-fprintf((FILE*)write, "%ld\n", Coordinate);//пишем координату Python
+sprintf(out, "%ld\n", Coordinate);
+write(write, out, countBufArray);
 }
 
 void getDataFromSensor(int write){
 if(count<1){
-fprintf((FILE*)write, "%s\n","N");//нечего отправлять
+write(write, "N", 1);
 return;
 }
 timevalToDouble();//преобразование времени
-fprintf((FILE*)write, "%d\n", count);//передаем размерность массива
 
+sprintf(out, "%ld\n", count);
+write(write, out, countBufArray);
+  
+  
 for(int i=0;i<=count;i++){
-fprintf((FILE*)write, "%f\n", Time[i]);//отсылаем время 1 тика
+sprintf(out, "%f\n", Time[i]);
+write(write, out, countBufArray);
 
-fprintf((FILE*)write, "%d\n", Coord[i]);//отсылаем координату 1 тика
+sprintf(out, "%ld\n", Coord[i]);
+write(write, out, countBufArray);
 
 }
 Clear();
@@ -237,7 +246,7 @@ pinMode(24, INPUT);
 State_A = digitalRead(23);
 State_B = digitalRead(24);
 while(1) {
-fgets(readbuffer,countBuf,(FILE*)fd[0]);
+read(fd[0], readbuffer, sizeof(readbuffer));
 
 if(readbuffer[0]== 'E')exit(0);//Выход
 if(readbuffer[0]== 'N'){//получение текущей координаты
@@ -261,12 +270,22 @@ pendPoint=0;
 offsetPointMax=0;
 }
 if(readbuffer[0]== 'S'){//Изменение чувствительнсоти
-{fgets(readbuffer,countBuf,(FILE*)fd[0]);
+{
+  read(fd[0], readbuffer, sizeof(readbuffer));
 
-sscanf(readbuffer, "%d", &pendPoint);
-fgets(readbuffer,countBuf,(FILE*)fd[0]);
+for(int i=0;i<sizeof(readbuffer);i++){
+    bufe[i]=readbuffer[i];
+}
+pendPoint=atoi(bufe);
+  
+read(fd[0], readbuffer, sizeof(readbuffer));
 
-sscanf(readbuffer, "%d", &offsetPointMax);
+for(int i=0;i<sizeof(readbuffer);i++){
+    bufe[i]=readbuffer[i];
+}
+pendPoint=atoi(bufe);
+  
+  
 }
 usleep(stopReadFromPipe);// сон после выполнения операция на пол сек
 
