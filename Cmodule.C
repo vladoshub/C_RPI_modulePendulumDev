@@ -246,6 +246,8 @@ pinMode (23, INPUT);
 pinMode(24, INPUT);
 State_A = digitalRead(23);
 State_B = digitalRead(24);
+  wiringPiISR(23,INT_EDGE_BOTH,ISR_A);
+wiringPiISR(24,INT_EDGE_BOTH,ISR_B);
 while(1) {
 read(fd[0], readbuffer, sizeof(readbuffer));
 
