@@ -284,7 +284,7 @@ read(fd[0], readbuffer, sizeof(readbuffer));
 for(int i=0;i<sizeof(readbuffer);i++){
     bufe[i]=readbuffer[i];
 }
-pendPoint=atoi(bufe);
+offsetPointMax=atoi(bufe);
   
   
 }
