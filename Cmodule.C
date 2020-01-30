@@ -16,6 +16,7 @@ Write,
 Pause
 };
 
+int n=0;
 char out[countBufArray];
 bool State_A, State_B;//каналы gpio
 bool Mah=true;//фикс движения обратно
@@ -49,8 +50,8 @@ count=0;
 }
 
 void getCurrentCoordinate(int write){ //получить текующую координату
-sprintf(out, "%ld\n", Coordinate);
-write(write, out, countBufArray);
+n=sprintf(out, "%ld\n", Coordinate);
+write(write, out, n);
 }
 
 void getDataFromSensor(int write){
@@ -60,16 +61,16 @@ return;
 }
 timevalToDouble();//преобразование времени
 
-sprintf(out, "%ld\n", count);
-write(write, out, countBufArray);
+n=sprintf(out, "%ld\n", count);
+write(write, out, n);
   
   
 for(int i=0;i<=count;i++){
-sprintf(out, "%f\n", Time[i]);
-write(write, out, countBufArray);
+n=sprintf(out, "%f\n", Time[i]);
+write(write, out, n);
 
-sprintf(out, "%ld\n", Coord[i]);
-write(write, out, countBufArray);
+n=sprintf(out, "%ld\n", Coord[i]);
+write(write, out, n);
 
 }
 Clear();
