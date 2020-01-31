@@ -50,27 +50,32 @@ count=0;
 }
 
 void getCurrentCoordinate(int w){ //получить текующую координату
-n=sprintf(out, "%ld\n", Coordinate);
-write(w, out, n);
+ sprintf(out, "%ld\n", Coordinate);
+ fputs(out, stdout);
+ fputs("\n", stdout);
 }
 
 void getDataFromSensor(int w){
 if(count<1){
-write(w, "N", 1);
+ fputs("N", stdout);
+ fputs("\n", fp);
 return;
 }
 timevalToDouble();//преобразование времени
 
 n=sprintf(out, "%ld\n", count);
-write(w, out, n);
+fputs(out, stdout);
+fputs("\n",stdout);
   
   
 for(int i=0;i<=count;i++){
 n=sprintf(out, "%f\n", Time[i]);
-write(w, out, n);
+fputs(out, stdout);
+fputs("\n",stdout);
 
 n=sprintf(out, "%ld\n", Coord[i]);
-write(w, out, n);
+fputs(out, stdout);
+fputs("\n",stdout);
 
 }
 Clear();
@@ -247,7 +252,7 @@ State_B = digitalRead(24);
 wiringPiISR(23,INT_EDGE_BOTH,ISR_A);
 wiringPiISR(24,INT_EDGE_BOTH,ISR_B);
 while(1) {
-read(fd[0], readbuffer, sizeof(readbuffer));
+ fgets(readbuffer, countBuf , stdin);
 
 if(readbuffer[0]== 'E')exit(0);//Выход
 if(readbuffer[0]== 'N'){//получение текущей координаты
@@ -272,14 +277,14 @@ offsetPointMax=0;
 }
 if(readbuffer[0]== 'S'){//Изменение чувствительнсоти
 {
-  read(fd[0], readbuffer, sizeof(readbuffer));
+  fgets(readbuffer, countBuf , stdin);
 
 for(int i=0;i<sizeof(readbuffer);i++){
     bufe[i]=readbuffer[i];
 }
 pendPoint=atoi(bufe);
   
-read(fd[0], readbuffer, sizeof(readbuffer));
+ fgets(readbuffer, countBuf , stdin);
 
 for(int i=0;i<sizeof(readbuffer);i++){
     bufe[i]=readbuffer[i];
@@ -295,5 +300,4 @@ usleep(stopReadFromPipe);// сон после выполнения операц�
 }
 
 
- fgets(buffer, BUFFERSIZE , stdin)
- fputs("\n", stdout);
+
