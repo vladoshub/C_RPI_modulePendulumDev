@@ -49,13 +49,13 @@ start = (struct timeval){0};
 count=0;
 }
 
-void getCurrentCoordinate(int w){ //получить текующую координату
+void getCurrentCoordinate(){ //получить текующую координату
  sprintf(out, "%ld\n", Coordinate);
  fputs(out, stdout);
  fputs("\n", stdout);
 }
 
-void getDataFromSensor(int w){
+void getDataFromSensor(){
 if(count<1){
  fputs("N", stdout);
  fputs("\n", fp);
@@ -256,7 +256,7 @@ while(1) {
 
 if(readbuffer[0]== 'E')exit(0);//Выход
 if(readbuffer[0]== 'N'){//получение текущей координаты
-getCurrentCoordinate(fd[1]);
+getCurrentCoordinate();
 }
 if(readbuffer[0]== 'W'){//Запись в буфер маха
 Clear();
@@ -265,7 +265,7 @@ typeWork=Ready;
 }
 if(readbuffer[0]== 'M'){//Отдать данные в систему
 typeWork=Pause;
-getDataFromSensor(fd[1]);
+getDataFromSensor();
 typeWork=Ready;
 }
 if(readbuffer[0]== 'C'){//Сброс
