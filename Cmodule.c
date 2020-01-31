@@ -1,4 +1,3 @@
-#include <wiringPi.h>
 #include <stdio.h>
 #include <math.h>
 #include <sys/time.h>
@@ -22,7 +21,7 @@ bool State_A, State_B;//каналы gpio
 bool Mah=true;//фикс движения обратно
 double Time[countElements];//массив с временем
 int Coord[countElements];//массив с координатами
-long Coordinate = 0;//координата
+short Coordinate = 0;//координата
 int count=0;//счетчик в массиве
 struct timeval start;//время от запуска всей программы(не нашел другой метод,поэтому просто будем вычитать это значение из времени полученного при срабатывания прерывания)
 struct timeval timevals[countElements];//массив структуры миллисекунд
@@ -50,7 +49,7 @@ count=0;
 }
 
 void getCurrentCoordinate(){ //получить текующую координату
- sprintf(out, "%ld\n", Coordinate);
+ sprintf(out, "%d\n", Coordinate);
  fputs(out, stdout);
  fputs("\n", stdout);
 }
@@ -58,12 +57,12 @@ void getCurrentCoordinate(){ //получить текующую координ�
 void getDataFromSensor(){
 if(count<1){
  fputs("N", stdout);
- fputs("\n", fp);
+ fputs("\n", stdout);
 return;
 }
 timevalToDouble();//преобразование времени
 
-n=sprintf(out, "%ld\n", count);
+n=sprintf(out, "%d\n", count);
 fputs(out, stdout);
 fputs("\n",stdout);
   
@@ -73,7 +72,7 @@ n=sprintf(out, "%f\n", Time[i]);
 fputs(out, stdout);
 fputs("\n",stdout);
 
-n=sprintf(out, "%ld\n", Coord[i]);
+n=sprintf(out, "%l\n", Coord[i]);
 fputs(out, stdout);
 fputs("\n",stdout);
 
@@ -244,13 +243,6 @@ break;
 int main()
 {
 readbuffer[0]='0';
-wiringPiSetupGpio (); //BCM mode
-pinMode (23, INPUT);
-pinMode(24, INPUT);
-State_A = digitalRead(23);
-State_B = digitalRead(24);  
-wiringPiISR(23,INT_EDGE_BOTH,ISR_A);
-wiringPiISR(24,INT_EDGE_BOTH,ISR_B);
 while(1) {
  fgets(readbuffer, countBuf , stdin);
 
@@ -298,6 +290,5 @@ usleep(stopReadFromPipe);// сон после выполнения операц�
 }
 }
 }
-
 
 
