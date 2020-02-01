@@ -25,7 +25,7 @@ bool Mah = true;
 double Time[countElements];	
 int Coord[countElements];
 static short Coordinate = 0;	
-static short Coordinate2 = 0;	
+static short saveWay = 0;	
 int count = 0;			
 struct timeval start;	
 struct timeval timevals[countElements];	
@@ -105,7 +105,7 @@ getDataFromSensor ()
 
 void callback(int way)
 {
-   Coordinate2=way;
+   saveWay=way;
    Coordinate += way;
    switch(typeWork){
 	    
@@ -137,7 +137,7 @@ void callback(int way)
 	      count++;
 	      switch (Channel){
 	          case '+':
-	          if(Coordinate2<0){
+	          if(saveWay<0){
 	              if(Mah==true)
 	              pendOffsetNow = Coordinate - pendOffset;
 	              if(pendOffsetNow>=Coordinate){
@@ -152,7 +152,7 @@ void callback(int way)
 	          }
 	          
 	          case '-':
-	          if(Coordinate2>0){
+	          if(saveWay>0){
 	              if(Mah==true)
 	              pendOffsetNow = Coordinate + pendOffset;
 	              if(pendOffsetNow<=Coordinate){
