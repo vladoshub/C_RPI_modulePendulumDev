@@ -114,6 +114,7 @@ void callback(int way)
 	    {		
 	      if(Coordinate>0)
 	      Channel = '+';
+	      typeWork = Write;
 	      else
 	      Channel = '-';
 	      typeWork = Write;
