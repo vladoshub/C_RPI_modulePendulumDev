@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pigpio.h>
+#include "rotary_encoder.h"
 #define countElements 20000
 #define countBuf 3
 #define countBufArray 10
@@ -22,7 +24,8 @@ bool State_A, State_B;
 bool Mah = true;	
 double Time[countElements];	
 int Coord[countElements];
-short Coordinate = 0;		
+static short Coordinate = 0;	
+static short Coordinate2 = 0;	
 int count = 0;			
 struct timeval start;	
 struct timeval timevals[countElements];	
@@ -288,10 +291,80 @@ ISR_B ()
 }
 
 
-
-int
-main ()
+void callback(int way)
 {
+   Coordinate2=Coordinate;
+   Coordinate += way;
+   switch(typeWork){
+	    
+   case Ready:
+   if (abs(Coordinate) > pendPoint){
+	    {		
+	      typeWork = Write;
+	      if(Coordinate>0)
+	      Channel = '+';
+	      else
+	      Channel = '-';
+	    }			
+	}
+   break;
+   
+   
+   
+   
+   
+   case Write:
+	      Coord[count] = abs (Coordinate);
+	      gettimeofday (&timevals[count], NULL);
+	      count++;
+	      switch (Channel){
+	          case '+':
+	          if(Coordinate2>=Coordinate){
+	              if(Mah==true)
+	              offsetPointMax = Coordinate - offsetPointMax;
+	              if(offsetPointMax=>Coordinate)
+	              typeWork=Pause;
+	              Mah=false;
+	          }
+	          else
+	          {
+	              Mah=true;
+	              offsetPointMax=10;
+	          }
+	          
+	          case '-':
+	          if(Coordinate2<=Coordinate){
+	              if(Mah==true)
+	              offsetPointMax = Coordinate + offsetPointMax;
+	              if(offsetPointMax<=Coordinate)
+	              typeWork=Pause;
+	              Mah=false;
+	          }
+	          else
+	          {
+	              Mah=true;
+	              offsetPointMax=10;
+	          }
+	      }
+	      	  
+   
+   
+   break;
+   
+   
+   default:
+   break;
+
+}
+}
+
+
+
+int main ()
+{
+  _Renc_t * renc;
+  if (gpioInitialise() < 0) return 1;
+  renc = Pi_Renc(17, 27, callback);
   readbuffer[0] = '0';
   while (1)
     {
@@ -349,4 +422,3 @@ main ()
 	}
     }
 }
-
