@@ -33,8 +33,9 @@ int stopReadFromPipe = 100000;
 char readbuffer[countBuf];	
 char bufe[countBuf];	
 char Channel = 'o';		
-int pendPoint = 10;		
-int offsetPointMax = 2;	
+short pendPoint = 10;		
+short pendOffsetNow = 0;	
+short pendOffset = 10;	
 enum workType typeWork = Ready;	
 
 void
@@ -99,196 +100,7 @@ getDataFromSensor ()
   Clear ();
 }
 
-void
-ISR_A ()		
-{
-  switch (typeWork)
-    {			
 
-    case Ready:		
-      State_A = !State_A;
-      if (State_B != State_A)
-	{
-	  Coordinate++;
-	  if (abs (Coordinate) > pendPoint)
-	    {			
-	      typeWork = Write;	
-	      Channel = '+';
-	    }		
-	}
-      else
-	{
-	  Coordinate--;
-	  if (abs (Coordinate) > pendPoint)
-	    {		
-	      typeWork = Write;
-	      Channel = '-';
-	    }			
-	}
-      break;
-
-    case Write:		
-      State_A = !State_A;
-      if (State_B != State_A)
-	{			
-	  if (Channel == '+')
-	    {		
-	      Coordinate++;
-	      Coord[count] = abs (Coordinate);
-	      gettimeofday (&timevals[count], NULL);
-	      count++;		
-	      Mah = true;	
-	    }
-	  else
-	    {		
-	      if (Mah)
-		{	
-		  Mah = false;	
-		}
-	      Coordinate++;
-	      if (abs (Coordinate) <= offsetPointMax)
-		{		
-		  typeWork = Pause;	
-		}
-
-	    }
-	}
-      else
-	{			
-
-
-	  if (Channel == '-')
-	    {		
-	      Coordinate--;
-	      Coord[count] = abs (Coordinate);
-	      gettimeofday (&timevals[count], NULL);
-	      count++;
-	      Mah = true;
-	    }
-	  else
-	    {			
-	      if (Mah)
-		{	
-		  offsetPointMax = abs (Coordinate) - offsetPointMax;
-		  Mah = false;
-		}
-	      Coordinate--;
-	      if (abs (Coordinate) <= offsetPointMax)
-		{
-		  typeWork = Pause;
-		}
-	    }
-
-	}
-      break;
-    case Pause:		
-      State_A = !State_A;
-      if (State_B != State_A)
-	Coordinate++;
-      else
-	{
-	  Coordinate--;
-	}
-      break;
-
-    }
-}
-
-void
-ISR_B ()
-{
-  switch (typeWork)
-    {
-
-    case Ready:		
-      State_B = !State_B;
-      if (State_B == State_A)
-	{
-	  Coordinate++;
-	  if (abs (Coordinate) > pendPoint)
-	    {		
-	      typeWork = Write;
-	      Channel = '+';
-	    }			
-	}
-      else
-	{
-	  Coordinate--;
-	  if (abs (Coordinate) > pendPoint)
-	    {		
-	      typeWork = Write;
-	      Channel = '-';
-	    }		
-	}
-      break;
-
-    case Write:	
-      State_B = !State_B;
-      if (State_B == State_A)
-	{		
-	  if (Channel == '+')
-	    {		
-	      Coordinate++;
-	      Coord[count] = abs (Coordinate);
-	      gettimeofday (&timevals[count], NULL);
-	      count++;
-	      Mah = true;
-	    }
-	  else
-	    {		
-	      if (Mah)
-		{	
-		  offsetPointMax = abs (Coordinate) - offsetPointMax;
-		  Mah = false;
-		}
-	      Coordinate++;
-	      if (abs (Coordinate) <= offsetPointMax)
-		{
-		  typeWork = Pause;
-		}
-
-	    }
-	}
-      else
-	{			
-	  if (Channel == '-')
-	    {		
-	      Coordinate--;
-	      Coord[count] = abs (Coordinate);
-	      gettimeofday (&timevals[count], NULL);
-	      count++;
-	      Mah = true;
-	    }
-	  else
-	    {			
-	      if (Mah)
-		{	
-		  offsetPointMax = abs (Coordinate) - offsetPointMax;
-		  Mah = false;
-		}
-	      Coordinate--;
-	      if (abs (Coordinate) <= offsetPointMax)
-		{
-		  typeWork = Pause;
-		}
-	    }
-
-	}
-
-      break;
-
-    case Pause:	
-      State_B = !State_B;
-      if (State_B == State_A)
-	Coordinate++;
-      else
-	{
-	  Coordinate--;
-	}
-      break;
-
-    }
-}
 
 
 void callback(int way)
@@ -300,11 +112,11 @@ void callback(int way)
    case Ready:
    if (abs(Coordinate) > pendPoint){
 	    {		
-	      typeWork = Write;
 	      if(Coordinate>0)
 	      Channel = '+';
 	      else
 	      Channel = '-';
+	      typeWork = Write;
 	    }			
 	}
    break;
@@ -319,36 +131,39 @@ void callback(int way)
 	      count++;
 	      switch (Channel){
 	          case '+':
-	          if(Coordinate2>=Coordinate){
+	          if(Coordinate2>Coordinate){
 	              if(Mah==true)
-	              offsetPointMax = Coordinate - offsetPointMax;
-	              if(offsetPointMax=>Coordinate)
+	              pendOffsetNow = Coordinate - pendOffset;
+	              if(pendOffsetNow>=Coordinate){
 	              typeWork=Pause;
 	              Mah=false;
+	              }
 	          }
 	          else
 	          {
 	              Mah=true;
-	              offsetPointMax=10;
 	          }
 	          
 	          case '-':
-	          if(Coordinate2<=Coordinate){
+	          if(Coordinate2<Coordinate){
 	              if(Mah==true)
-	              offsetPointMax = Coordinate + offsetPointMax;
-	              if(offsetPointMax<=Coordinate)
+	              pendOffsetNow = Coordinate + pendOffset;
+	              if(pendOffsetNow<=Coordinate){
 	              typeWork=Pause;
 	              Mah=false;
+	              }
 	          }
 	          else
 	          {
 	              Mah=true;
-	              offsetPointMax=10;
 	          }
 	      }
 	      	  
    
    
+   break;
+   
+   case Pause:
    break;
    
    
@@ -380,7 +195,10 @@ int main ()
 	{		
 	  Clear ();
 	  gettimeofday (&start, NULL);
+	  Channel='o';
+	  Coordinate2=0;
 	  typeWork = Ready;
+	  
 	}
       if (readbuffer[0] == 'M')
 	{		
@@ -393,8 +211,8 @@ int main ()
 	  Clear ();
 	  Coordinate = 0;
 	  Channel = 'o';
-	  pendPoint = 0;
-	  offsetPointMax = 0;
+	  pendOffset = 0;
+	  pendOffsetNow = 0;
 	}
       if (readbuffer[0] == 'S')
 	{		
@@ -413,7 +231,7 @@ int main ()
 	      {
 		bufe[i] = readbuffer[i];
 	      }
-	    offsetPointMax = atoi (bufe);
+	    pendOffset = atoi (bufe);
 
 
 	  }
