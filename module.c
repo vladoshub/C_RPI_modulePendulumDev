@@ -86,13 +86,13 @@ getDataFromSensor ()
   fputs ("\n", stdout);
 
 
-  for (int i = 0; i <= count; i++)
+  for (int i = 0; i <= count-1; i++)
     {
       n = sprintf (out, "%f\n", Time[i]);
       fputs (out, stdout);
       fputs ("\n", stdout);
 
-      n = sprintf (out, "%l\n", Coord[i]);
+      n = sprintf (out, "%d\n", Coord[i]);
       fputs (out, stdout);
       fputs ("\n", stdout);
 
@@ -105,16 +105,17 @@ getDataFromSensor ()
 
 void callback(int way)
 {
-   Coordinate2=Coordinate;
+   Coordinate2=way;
    Coordinate += way;
    switch(typeWork){
 	    
    case Ready:
    if (abs(Coordinate) > pendPoint){
-	    {		
+
 	      if(Coordinate>0){
-	      Channel = '+';
+	         Channel = '+';
 	         typeWork = Write;
+
 		 }
 	      else{
 	      Channel = '-';
@@ -122,8 +123,9 @@ void callback(int way)
 	    }			
 
 }
-}
+
    break;
+
    
    
    
@@ -135,13 +137,14 @@ void callback(int way)
 	      count++;
 	      switch (Channel){
 	          case '+':
-	          if(Coordinate2>Coordinate){
+	          if(Coordinate2<0){
 	              if(Mah==true)
 	              pendOffsetNow = Coordinate - pendOffset;
 	              if(pendOffsetNow>=Coordinate){
 	              typeWork=Pause;
-	              Mah=false;
+	              Mah=true;
 	              }
+	               Mah=false;
 	          }
 	          else
 	          {
@@ -149,13 +152,14 @@ void callback(int way)
 	          }
 	          
 	          case '-':
-	          if(Coordinate2<Coordinate){
+	          if(Coordinate2>0){
 	              if(Mah==true)
 	              pendOffsetNow = Coordinate + pendOffset;
 	              if(pendOffsetNow<=Coordinate){
 	              typeWork=Pause;
-	              Mah=false;
+	              Mah=true;
 	              }
+	                    Mah=false;
 	          }
 	          else
 	          {
@@ -181,7 +185,8 @@ void callback(int way)
 
 int main ()
 {
-  _Renc_t * renc;
+  typeWork=Pause;
+  Pi_Renc_t * renc;
   if (gpioInitialise() < 0) return 1;
   renc = Pi_Renc(17, 27, callback);
   readbuffer[0] = '0';
