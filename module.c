@@ -205,7 +205,7 @@ int main ()
 	  Clear ();
 	  gettimeofday (&start, NULL);
 	  Channel='o';
-	  Coordinate2=0;
+	  saveWay=0;
 	  typeWork = Ready;
 	  
 	}
