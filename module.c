@@ -112,14 +112,17 @@ void callback(int way)
    case Ready:
    if (abs(Coordinate) > pendPoint){
 	    {		
-	      if(Coordinate>0)
+	      if(Coordinate>0){
 	      Channel = '+';
-	      typeWork = Write;
-	      else
+	         typeWork = Write;
+		 }
+	      else{
 	      Channel = '-';
 	      typeWork = Write;
 	    }			
-	}
+
+}
+}
    break;
    
    
