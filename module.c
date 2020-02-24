@@ -67,7 +67,7 @@ getCurrentCoordinate ()
 {		
   sprintf (out, "%d\n", Coordinate);
   fputs (out, stdout);
-  fputs ("\n", stdout);
+  fflush(stdout);
 }
 
 void
@@ -75,26 +75,26 @@ getDataFromSensor ()
 {
   if (count < 1)
     {
-      fputs ("N", stdout);
-      fputs ("\n", stdout);
+      fputs ("N\n", stdout);
+      fflush(stdout);
       return;
     }
   timevalToDouble ();		
 
   n = sprintf (out, "%d\n", count);
   fputs (out, stdout);
-  fputs ("\n", stdout);
+  fflush(stdout);
 
 
   for (int i = 0; i <= count-1; i++)
     {
       n = sprintf (out, "%f\n", Time[i]);
       fputs (out, stdout);
-      fputs ("\n", stdout);
+      fflush(stdout);
 
       n = sprintf (out, "%d\n", Coord[i]);
       fputs (out, stdout);
-      fputs ("\n", stdout);
+      fflush(stdout);
 
     }
   Clear ();
