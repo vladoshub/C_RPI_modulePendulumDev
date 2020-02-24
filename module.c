@@ -71,6 +71,25 @@ getCurrentCoordinate ()
 }
 
 void
+getTypeWork()
+{
+switch(typeWork){
+case Ready:
+fputs ("Ready\n", stdout);
+fflush(stdout);	
+break;
+case Pause:
+fputs ("Pause\n", stdout);
+fflush(stdout);	
+break;
+case Write:
+case Pause:
+fputs ("Write\n", stdout);
+fflush(stdout);
+break;
+}
+}
+void
 getDataFromSensor ()
 {
   if (count < 1)
@@ -222,6 +241,10 @@ int main ()
 	  Channel = 'o';
 	  pendOffset = 0;
 	  pendOffsetNow = 0;
+	}
+	  if (readbuffer[0] == 'T')
+	{		
+	  getTypeWork();
 	}
       if (readbuffer[0] == 'S')
 	{		
