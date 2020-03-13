@@ -60,6 +60,7 @@ Clear ()
   {
   0};
   count = 0;
+  typeWork=Pause;
 }
 
 void
