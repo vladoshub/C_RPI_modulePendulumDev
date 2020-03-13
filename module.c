@@ -18,6 +18,12 @@ enum workType
   Pause
 };
 
+enum lastWork
+{
+  Complete,
+  notComplete
+};
+
 int n = 0;
 char out[countBufArray];
 bool State_A, State_B;	
@@ -76,18 +82,29 @@ getTypeWork()
 {
 switch(typeWork){
 case Ready:
-fputs ("Ready\n", stdout);
+fputs ("R\n", stdout);
 fflush(stdout);	
 break;
 case Pause:
-fputs ("Pause\n", stdout);
+fputs ("I\n", stdout);
 fflush(stdout);	
 break;
 case Write:
 case Pause:
-fputs ("Write\n", stdout);
+fputs ("A\n", stdout);
 fflush(stdout);
 break;
+}
+	
+switch(lastWork){
+case Complete:
+fputs ("S\n", stdout);
+fflush(stdout);	
+break;
+case notComplete:
+fputs ("N\n", stdout);
+fflush(stdout);	
+break;	
 }
 }
 void
@@ -177,6 +194,7 @@ void callback(int way)
 	              pendOffsetNow = Coordinate + pendOffset;
 	              if(pendOffsetNow<=Coordinate){
 	              typeWork=Pause;
+		      lastWork=Complete;
 	              Mah=true;
 	              }
 	                    Mah=false;
@@ -205,6 +223,7 @@ void callback(int way)
 
 int main ()
 {
+  lastWork=notComplete;
   typeWork=Pause;
   Pi_Renc_t * renc;
   if (gpioInitialise() < 0) return 1;
@@ -227,6 +246,7 @@ int main ()
 	  Channel='o';
 	  saveWay=0;
 	  typeWork = Ready;
+	  lastWork=notComplete;
 	  
 	}
       if (readbuffer[0] == 'M')
