@@ -169,7 +169,7 @@ void callback(int way)
    
    
    case Write:
-	      Coord[count] = abs (Coordinate);
+	      Coord[count] = Coordinate;
 	      gettimeofday (&timevals[count], NULL);
 	      count++;
 	      switch (Channel){
