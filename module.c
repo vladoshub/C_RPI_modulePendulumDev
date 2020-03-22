@@ -21,7 +21,8 @@ enum workType
 enum lastWork
 {
   Complete,
-  notComplete
+  notComplete,
+  Over
 };
 
 int n = 0;
@@ -69,6 +70,44 @@ Clear ()
   typeWork=Pause;
 }
 
+
+void
+mode ()
+{
+switch(workType){
+case Ready:
+fputs ("R\n", stdout);
+fflush(stdout);	
+break;
+case Pause:
+fputs ("I\n", stdout);
+fflush(stdout);	
+break;
+case Write:
+case Pause:
+fputs ("A\n", stdout);
+fflush(stdout);
+break;
+}
+
+
+
+void
+last ()
+{
+switch(lastWork){
+case Complete:
+fputs ("S\n", stdout);
+fflush(stdout);	
+break;
+case notComplete:
+fputs ("N\n", stdout);
+fflush(stdout);	
+break;	
+}
+}
+
+
 void
 getCurrentCoordinate ()
 {		
@@ -80,7 +119,7 @@ getCurrentCoordinate ()
 void
 getTypeWork()
 {
-switch(typeWork){
+switch(workType){
 case Ready:
 fputs ("R\n", stdout);
 fflush(stdout);	
@@ -104,7 +143,11 @@ break;
 case notComplete:
 fputs ("N\n", stdout);
 fflush(stdout);	
-break;	
+break;
+case Over:
+fputs ("O\n", stdout);
+fflush(stdout);	
+break;
 }
 }
 void
@@ -117,7 +160,7 @@ getDataFromSensor ()
       return;
     }
   timevalToDouble ();		
-
+  mode();
   n = sprintf (out, "%d\n", count);
   fputs (out, stdout);
   fflush(stdout);
@@ -169,6 +212,11 @@ void callback(int way)
    
    
    case Write:
+	      if(count >= countElements){
+	      lastWork=Over;
+	      typeWork=Pause;	      
+	      }
+              else{
 	      Coord[count] = Coordinate;
 	      gettimeofday (&timevals[count], NULL);
 	      count++;
@@ -179,6 +227,8 @@ void callback(int way)
 	              pendOffsetNow = Coordinate - pendOffset;
 	              if(pendOffsetNow>=Coordinate){
 	              typeWork=Pause;
+		      last();
+		      lastWork=Complete;
 	              Mah=true;
 	              }
 	               Mah=false;
@@ -195,6 +245,7 @@ void callback(int way)
 	              if(pendOffsetNow<=Coordinate){
 	              typeWork=Pause;
 		      lastWork=Complete;
+	              last();
 	              Mah=true;
 	              }
 	                    Mah=false;
@@ -204,6 +255,7 @@ void callback(int way)
 	              Mah=true;
 	          }
 	      }
+	 }
 	      	  
    
    
