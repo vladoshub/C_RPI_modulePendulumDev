@@ -26,6 +26,7 @@ enum lastWork
 };
 
 int n = 0;
+double times=0;
 char out[countBufArray];
 bool State_A, State_B;	
 bool Mah = true;	
@@ -56,6 +57,7 @@ timevalToDouble ()
 void
 Clear ()
 {
+  times=0;
   for (int i = 0; i <= count; i++)
     {
       Time[i] = 0;
@@ -160,22 +162,20 @@ break;
 void
 getDataFromSensor ()
 {
-  if (count < 1)
-    {
-      fputs ("N\n", stdout);
-      fflush(stdout);
-      return;
-    }
+
   timevalToDouble ();		
   mode();
   n = sprintf (out, "%d\n", count);
   fputs (out, stdout);
   fflush(stdout);
-
+  
+  if(count>0){
+   times=Time[0];
+  }
 
   for (int i = 0; i <= count-1; i++)
     {
-      n = sprintf (out, "%f\n", Time[i]);
+      n = sprintf (out, "%f\n", (Time[i]-times));
       fputs (out, stdout);
       fflush(stdout);
 
@@ -234,11 +234,13 @@ void callback(int way)
 	              pendOffsetNow = Coordinate - pendOffset;
 	              if(pendOffsetNow>=Coordinate){
 	              typeWork=Pause;
-		      last();
 		      lastWorks=Complete;
+		      last();
 	              Mah=true;
 	              }
+		      else{
 	               Mah=false;
+		     }
 	          }
 	          else
 	          {
@@ -255,7 +257,9 @@ void callback(int way)
 	              last();
 	              Mah=true;
 	              }
+		      else{
 	                    Mah=false;
+			  }
 	          }
 	          else
 	          {
@@ -301,9 +305,7 @@ int main ()
       if (readbuffer[0] == 'W')
 	{		
 	  Clear ();
-	  start = (struct timeval)
-	  {
-          0};
+	  gettimeofday(&start,NULL);
 	  Channel='o';
 	  saveWay=0;
 	  typeWork = Ready;
