@@ -43,7 +43,8 @@ char Channel = 'o';
 short pendPoint = 10;		
 short pendOffsetNow = 0;	
 short pendOffset = 10;	
-enum workType typeWork = Ready;	
+enum workType typeWork = Ready;
+enum lastWork lastWorks = notComplete;		
 
 void
 timevalToDouble ()
@@ -68,13 +69,14 @@ Clear ()
   0};
   count = 0;
   typeWork=Pause;
+  lastWorks=notComplete;
 }
 
 
 void
 mode ()
 {
-switch(workType){
+switch(typeWork){
 case Ready:
 fputs ("R\n", stdout);
 fflush(stdout);	
@@ -84,10 +86,10 @@ fputs ("I\n", stdout);
 fflush(stdout);	
 break;
 case Write:
-case Pause:
 fputs ("A\n", stdout);
 fflush(stdout);
 break;
+}
 }
 
 
@@ -95,7 +97,7 @@ break;
 void
 last ()
 {
-switch(lastWork){
+switch(lastWorks){
 case Complete:
 fputs ("S\n", stdout);
 fflush(stdout);	
@@ -103,7 +105,11 @@ break;
 case notComplete:
 fputs ("N\n", stdout);
 fflush(stdout);	
-break;	
+break;
+case Over:
+fputs ("O\n", stdout);
+fflush(stdout);	
+break;		
 }
 }
 
@@ -119,7 +125,7 @@ getCurrentCoordinate ()
 void
 getTypeWork()
 {
-switch(workType){
+switch(typeWork){
 case Ready:
 fputs ("R\n", stdout);
 fflush(stdout);	
@@ -129,13 +135,14 @@ fputs ("I\n", stdout);
 fflush(stdout);	
 break;
 case Write:
-case Pause:
 fputs ("A\n", stdout);
 fflush(stdout);
 break;
 }
+
 	
-switch(lastWork){
+switch(lastWorks){
+  
 case Complete:
 fputs ("S\n", stdout);
 fflush(stdout);	
@@ -213,7 +220,7 @@ void callback(int way)
    
    case Write:
 	      if(count >= countElements){
-	      lastWork=Over;
+	      lastWorks=Over;
 	      typeWork=Pause;	      
 	      }
               else{
@@ -228,7 +235,7 @@ void callback(int way)
 	              if(pendOffsetNow>=Coordinate){
 	              typeWork=Pause;
 		      last();
-		      lastWork=Complete;
+		      lastWorks=Complete;
 	              Mah=true;
 	              }
 	               Mah=false;
@@ -244,7 +251,7 @@ void callback(int way)
 	              pendOffsetNow = Coordinate + pendOffset;
 	              if(pendOffsetNow<=Coordinate){
 	              typeWork=Pause;
-		      lastWork=Complete;
+		      lastWorks=Complete;
 	              last();
 	              Mah=true;
 	              }
@@ -275,7 +282,7 @@ void callback(int way)
 
 int main ()
 {
-  lastWork=notComplete;
+  lastWorks=notComplete;
   typeWork=Pause;
   Pi_Renc_t * renc;
   if (gpioInitialise() < 0) return 1;
@@ -294,11 +301,13 @@ int main ()
       if (readbuffer[0] == 'W')
 	{		
 	  Clear ();
-	  gettimeofday (&start, NULL);
+	  start = (struct timeval)
+	  {
+          0};
 	  Channel='o';
 	  saveWay=0;
 	  typeWork = Ready;
-	  lastWork=notComplete;
+	  lastWorks=notComplete;
 	  
 	}
       if (readbuffer[0] == 'M')
