@@ -173,7 +173,7 @@ getDataFromSensor ()
    times=Time[0];
   }
 
-  for (int i = 0; i <= count-1; i++)
+  for (int i = 0; i <= count-2; i++)
     {
       n = sprintf (out, "%f\n", (Time[i]-times));
       fputs (out, stdout);
@@ -184,7 +184,7 @@ getDataFromSensor ()
       fflush(stdout);
 
     }
-  Clear ();
+ 
 }
 
 
@@ -303,27 +303,32 @@ int main ()
 	  getCurrentCoordinate ();
 	}
       if (readbuffer[0] == 'W')
-	{		
-	  Clear ();
+	{
+	  if(typeWork==Pause){	
+	  count=0;
+	  Coordinate=0;
 	  gettimeofday(&start,NULL);
 	  Channel='o';
 	  saveWay=0;
 	  typeWork = Ready;
 	  lastWorks=notComplete;
+	}
+	else{
+	  getTypeWork();
 	  
 	}
+      }
       if (readbuffer[0] == 'M')
 	{		
 	  typeWork = Pause;
 	  getDataFromSensor ();
-	  typeWork = Ready;
+	  typeWork = Pause;
 	}
       if (readbuffer[0] == 'C')
 	{		
 	  Clear ();
 	  Coordinate = 0;
 	  Channel = 'o';
-	  pendOffset = 0;
 	  pendOffsetNow = 0;
 	}
 	  if (readbuffer[0] == 'T')
