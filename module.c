@@ -358,8 +358,9 @@ int main ()
 
 
 	  }
-	  usleep (stopReadFromPipe);	
+
 
 	}
+	usleep (stopReadFromPipe);	
     }
 }
