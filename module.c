@@ -201,11 +201,13 @@ void callback(int way)
 
 	      if(Coordinate>0){
 	         Channel = '+';
+		 gettimeofday(&start,NULL);
 	         typeWork = Write;
 
 		 }
 	      else{
 	      Channel = '-';
+              gettimeofday(&start,NULL);
 	      typeWork = Write;
 	    }			
 
@@ -307,7 +309,7 @@ int main ()
 	  if(typeWork==Pause){	
 	  count=0;
 	  Coordinate=0;
-	  gettimeofday(&start,NULL);
+	  //gettimeofday(&start,NULL);
 	  Channel='o';
 	  saveWay=0;
 	  typeWork = Ready;
