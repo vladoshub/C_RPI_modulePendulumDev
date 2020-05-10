@@ -349,9 +349,10 @@ int main ()
 		bufe[i] = readbuffer[i];
 	      }
 	    pendPoint = atoi (bufe);
-
+            fflush(stdin);
 	    fgets (readbuffer, countBuf, stdin);
-
+            if(readbuffer[0] == '\n')
+            fgets (readbuffer, countBuf, stdin);
 	    for (int i = 0; i < sizeof (readbuffer); i++)
 	      {
 		bufe[i] = readbuffer[i];
