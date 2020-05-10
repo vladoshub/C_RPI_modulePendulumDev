@@ -248,6 +248,7 @@ void callback(int way)
 	          {
 	              Mah=true;
 	          }
+		break;
 	          
 	          case '-':
 	          if(saveWay>0){
@@ -267,6 +268,7 @@ void callback(int way)
 	          {
 	              Mah=true;
 	          }
+		break;
 	      }
 	 }
 	      	  
