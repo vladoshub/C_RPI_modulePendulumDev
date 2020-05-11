@@ -169,13 +169,10 @@ getDataFromSensor ()
   fputs (out, stdout);
   fflush(stdout);
   
-  if(count>0){
-   times=Time[0];
-  }
 
   for (int i = 0; i <= count-2; i++)
     {
-      n = sprintf (out, "%f\n", (Time[i]-times));
+      n = sprintf (out, "%f\n", (Time[i]));
       fputs (out, stdout);
       fflush(stdout);
 
